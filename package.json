@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon . scan my-music",
-    "tree": "nodemon . tree my-music",
+    "tracks": "nodemon . tracks my-music",
     "version": "node . --version"
   },
   "keywords": [

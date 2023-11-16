@@ -3,27 +3,28 @@ const program = new Command();
 const packageJson = require("./package.json");
 const dree = require("dree");
 
-function scanArtist(directory) {
-  let scanResult = [];
-  dree.scan(directory).children.forEach((artist) => {
-    item = {};
-    item.artist = artist.name;
-    item.tracks = [];
-    artist.children.map((track) => {
+function scanArtists(directory) {
+  let result = [];
+  dree.scan(directory).children.forEach((itArtist) => {
+    artist = {};
+    artist.artist = itArtist.name;
+    artist.tracks = [];
+    itArtist.children.map((itTrack) => {
       track = {};
-      track.fullname = track.name;
-      item.tracks.push(track);
+      track.fullname = itTrack.name;
+      track = { ...splitTrack(track) };
+      artist.tracks.push(track);
     });
-    scanResult.push(item);
+    result.push(artist);
   });
-  return scanResult;
+  return result;
 }
 
 function splitTrack(trackFullname) {
   splittedTrack = trackFullname.split(" - ");
   return {
     artist: splittedTrack[0],
-    name: splitTrack[1],
+    name: splittedTrack[1],
   };
 }
 
@@ -37,24 +38,27 @@ program
   .description("List all anomalies")
   .argument("<directory>", "Your Music Directory to read")
   .action((directory) => {
-    scanArtist(directory).forEach((artist) => {
-      console.log(
-        `${artist.name}`,
-        artist.children.map((music) => music.name)
-      );
+    scanArtists(directory).forEach((item) => {
+      console.log(`--------------${item.artist}--------------`);
+      i = 0;
+      item.tracks.forEach((track) => {
+        console.log(`track ${i}: ${track.fullname}`);
+        i++;
+      });
+    });
   });
 
 program
-  .command("tree")
+  .command("tracks")
   .description(
     "Display the music tree from the Music Directory without any validation"
   )
   .argument("<directory>", "Your Music Directory to read")
   .action((directory) => {
-    dree.scan(directory).children.forEach((artist) => {
+    dree.scan(directory).children.forEach((itArtist) => {
       console.log(
-        `${artist.name}`,
-        artist.children.map((music) => music.name)
+        `${itArtist.name}`,
+        itArtist.children.map((itTrack) => itTrack.name)
       );
     });
   });
