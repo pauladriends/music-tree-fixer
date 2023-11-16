@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node .",
+    "start": "nodemon . scan my-music",
+    "tree": "nodemon . tree my-music",
     "version": "node . --version"
   },
   "keywords": [
