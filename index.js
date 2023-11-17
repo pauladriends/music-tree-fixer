@@ -10,9 +10,12 @@ function scanArtists(directory) {
     artist.artist = itArtist.name;
     artist.tracks = [];
     itArtist.children.map((itTrack) => {
-      track = {};
-      track.fullname = itTrack.name;
-      track = { ...splitTrack(track) };
+      const { splittedArtist, splittedName } = splitTrack(itTrack.name);
+      track = {
+        fullname: itTrack.name,
+        artist: splittedArtist,
+        name: splittedName,
+      };
       artist.tracks.push(track);
     });
     result.push(artist);
@@ -23,8 +26,8 @@ function scanArtists(directory) {
 function splitTrack(trackFullname) {
   splittedTrack = trackFullname.split(" - ");
   return {
-    artist: splittedTrack[0],
-    name: splittedTrack[1],
+    splittedArtist: splittedTrack[0],
+    splittedName: splittedTrack[1],
   };
 }
 
@@ -38,11 +41,13 @@ program
   .description("List all anomalies")
   .argument("<directory>", "Your Music Directory to read")
   .action((directory) => {
-    scanArtists(directory).forEach((item) => {
-      console.log(`--------------${item.artist}--------------`);
+    scanArtists(directory).forEach((itArtist) => {
+      console.log(`--------------${itArtist.artist}--------------`);
       i = 0;
-      item.tracks.forEach((track) => {
-        console.log(`track ${i}: ${track.fullname}`);
+      itArtist.tracks.forEach((itTrack) => {
+        console.log(` + track ${i}: ${itTrack.fullname}`);
+        console.log(`    - artist: ${itTrack.artist}`);
+        console.log(`    - name: ${itTrack.name}`);
         i++;
       });
     });
