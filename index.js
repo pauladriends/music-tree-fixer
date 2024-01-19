@@ -59,6 +59,20 @@ function controlExtensionIsMP3(ext) {
   return ext === "mp3" || ext === "MP3";
 }
 
+function controlOptionsAreFeatMixRemasterLive(track) {
+  optionAllowed = ["feat", "mix", "remaster", "live"];
+  isOk = true;
+  if (track.option1) {
+    option = track.option1.split(" ");
+    isOk = optionAllowed.includes(option[0]);
+  }
+  if (isOk && track.option2) {
+    option = track.option2.split(" ");
+    isOk = optionAllowed.includes(option[0]);
+  }
+  return isOk;
+}
+
 program
   .name(packageJson.name)
   .description(packageJson.description)
@@ -94,6 +108,10 @@ program
           console.log("track contains too much option");
         if (!controlExtensionIsMP3(itTrack.ext))
           console.log("track does not have ext or is not equal to mp3");
+        if (!controlOptionsAreFeatMixRemasterLive(itTrack))
+          console.log(
+            "option1 or option2 is not allowed (mix, remaster, live or feat)"
+          );
         i++;
       });
     });
