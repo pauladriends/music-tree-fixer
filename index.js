@@ -2,6 +2,9 @@ const { Command } = require("commander");
 const program = new Command();
 const packageJson = require("./package.json");
 const dree = require("dree");
+const validators = require("./validators.js");
+
+console.log(require("./validators.js"));
 
 function scanArtists(directory) {
   let result = [];
@@ -18,6 +21,7 @@ function scanArtists(directory) {
         splittedExt,
       } = splitTrack(itTrack.name);
       track = {
+        artistFolder: itArtist.name,
         fullname: itTrack.name,
         artist: splittedArtist,
         name: splittedName,
@@ -43,36 +47,6 @@ function splitTrack(trackFullname) {
   };
 }
 
-function controlContainsNameAndArtist(track) {
-  return track.name && track.artist;
-}
-
-function controlArtistFolderEqualsToArtistTrack(artistFolder, artistTrack) {
-  return artistFolder === artistTrack;
-}
-
-function controlContainsNotTooMuchHyhens(trackFullname) {
-  return trackFullname.split(" - ").length < 5;
-}
-
-function controlExtensionIsMP3(ext) {
-  return ext === "mp3" || ext === "MP3";
-}
-
-function controlOptionsAreFeatMixRemasterLive(track) {
-  optionAllowed = ["feat", "mix", "remaster", "live"];
-  isOk = true;
-  if (track.option1) {
-    option = track.option1.split(" ");
-    isOk = optionAllowed.includes(option[0]);
-  }
-  if (isOk && track.option2) {
-    option = track.option2.split(" ");
-    isOk = optionAllowed.includes(option[0]);
-  }
-  return isOk;
-}
-
 program
   .name(packageJson.name)
   .description(packageJson.description)
@@ -93,27 +67,15 @@ program
         if (itTrack.option1) console.log(`    - option1: ${itTrack.option1}`);
         if (itTrack.option2) console.log(`    - option2: ${itTrack.option2}`);
         if (itTrack.ext) console.log(`    - ext: ${itTrack.ext}`);
-        if (!controlContainsNameAndArtist(itTrack))
-          console.log("track does not have a name and/or artist");
-        if (
-          !controlArtistFolderEqualsToArtistTrack(
-            itArtist.artist,
-            itTrack.artist
-          )
-        )
-          console.log(
-            "artist folder name does not equals to artist track name"
-          );
-        if (!controlContainsNotTooMuchHyhens(itTrack.fullname))
-          console.log("track contains too much option");
-        if (!controlExtensionIsMP3(itTrack.ext))
-          console.log("track does not have ext or is not equal to mp3");
-        if (!controlOptionsAreFeatMixRemasterLive(itTrack))
-          console.log(
-            "option1 or option2 is not allowed (mix, remaster, live or feat)"
-          );
+        validators.forEach((validator) => {
+          if (!validator.controller(itTrack)) validator.errors.push(itTrack);
+        });
         i++;
       });
+    });
+
+    validators.forEach((validator) => {
+      console.log(`nb ${validator.name}: ${validator.errors.length}`);
     });
   });
 
